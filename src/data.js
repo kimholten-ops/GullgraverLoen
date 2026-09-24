@@ -28,8 +28,8 @@ export const BUILDINGS = [
   { id: 'analyse', name: 'Analysekontoret', sign: 'ANALYSE' },
   { id: 'bank', name: 'Tørrbekk Bank', sign: 'BANK' },
   { id: 'saloon', name: 'Den tørste mulen', sign: 'SALOON' },
-  { id: 'hotell', name: 'Hotell Utsikten', sign: 'HOTELL' },
-  { id: 'stall', name: 'Stallen', sign: 'STALL' },
+  { id: 'hotell', name: 'Dede&Cams Hotell', sign: 'HOTELL' },
+  { id: 'stall', name: 'Ridskolan', sign: 'RIDSKOLE' },
 ];
 
 export const PRICES = {
