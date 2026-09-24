@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="nb">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#1d1838">
+  <title>Gullgraver Loen</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⛏️</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Rye&family=VT323&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div id="app">
+    <header class="hud">
+      <div class="hud-row">
+        <span id="where">Tørrbekk</span>
+        <span id="hud-day">Dag 1, 07:00</span>
+      </div>
+      <div class="hud-row hud-wealth">
+        <strong id="hud-money">$40</strong>
+        <strong id="hud-gold" class="gold">0,00 oz gull</strong>
+      </div>
+      <div class="bars">
+        <div class="bar health" id="bar-health"><span>Helse</span><i></i></div>
+        <div class="bar food" id="bar-food"><span>Mat</span><i></i></div>
+        <div class="bar water" id="bar-water"><span>Vann</span><i></i></div>
+      </div>
+      <p id="hud-inv" class="inv">Gullpanne</p>
+    </header>
+
+    <main id="stage">
+      <canvas id="view" role="img" aria-label="Spillverdenen sett fra siden"></canvas>
+    </main>
+
+    <p id="prompt"></p>
+    <section id="log" aria-live="polite"></section>
+
+    <nav class="controls" aria-label="Kontroller">
+      <div class="dpad">
+        <button data-dir="up" class="up" aria-label="Hopp, gå inn eller klatre">▲</button>
+        <button data-dir="left" class="left" aria-label="Gå til venstre">◀</button>
+        <button data-dir="right" class="right" aria-label="Gå til høyre">▶</button>
+        <button data-dir="down" class="down" aria-label="Grav eller klatre ned">▼</button>
+      </div>
+      <div class="actions">
+        <button id="act-pan" class="btn">Vask gull <kbd>V</kbd></button>
+        <button id="act-water" class="btn">Fyll vann <kbd>F</kbd></button>
+        <button id="act-blast" class="btn">Dynamitt <kbd>X</kbd></button>
+        <button id="act-camp" class="btn">Slå leir <kbd>L</kbd></button>
+        <button id="act-map" class="btn">Kart <kbd>M</kbd></button>
+      </div>
+    </nav>
+  </div>
+
+  <div id="panel" class="overlay" hidden>
+    <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="panel-title">
+      <div class="sheet-head">
+        <h2 id="panel-title"></h2>
+        <button id="panel-close" class="close" aria-label="Lukk">✕</button>
+      </div>
+      <p id="panel-text"></p>
+      <div id="map-wrap" hidden><canvas id="map"></canvas></div>
+      <div id="panel-buttons" class="panel-buttons"></div>
+    </div>
+  </div>
+
+  <div id="title" class="overlay title-screen">
+    <div class="title-inner">
+      <p class="year">Arizona, 1891</p>
+      <h1>Gullgraver<br>Loen</h1>
+      <p class="intro">Stian Lønvik fra Inderøy har reist over havet for å finne Hollenderens tapte gullgruve i Superstitionfjellene. Ingen som har lett etter den, har kommet tilbake rike.</p>
+      <div class="title-buttons">
+        <button id="btn-continue" class="btn primary" hidden>Fortsett reisen</button>
+        <button id="btn-new" class="btn">Nytt spill</button>
+      </div>
+      <p class="keys">◀ ▶ for å gå, ▲ for å hoppe eller gå inn dører og gruver. I gruvene graver du i alle retninger. V vasker gull i bekker, X tenner dynamitt, L slår leir, M viser kartet.</p>
+      <p class="credits">Grafikk: «Cowboy» av software_atelier og ørkenfliser fra gameart2d.com, begge CC0 via OpenGameArt.</p>
+    </div>
+    <div class="horizon" aria-hidden="true"></div>
+  </div>
+
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>
