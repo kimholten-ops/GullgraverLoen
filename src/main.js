@@ -527,7 +527,7 @@ const BUILDING_PANELS = {
     ],
   }),
   hotell: () => ({
-    title: 'Hotell Utsikten',
+    title: 'Dede&Cams Hotell',
     text: `Et rent rom, ei ekte seng og frokost i morgen: $${PRICES.hotel}.`,
     buttons: [{
       label: `Sov til morgenen ($${PRICES.hotel})`,
@@ -542,7 +542,7 @@ const BUILDING_PANELS = {
     }],
   }),
   stall: () => ({
-    title: 'Stallen',
+    title: 'Ridskolan',
     text: S.inv.mule
       ? 'Brunsi, muldyret ditt, tygger fornøyd på høy. Hun er stelt og klar.'
       : `Et sta, men sterkt muldyr ved navn Brunsi står til salgs: $${PRICES.mule}. Med henne reiser du dobbelt så fort.`,
