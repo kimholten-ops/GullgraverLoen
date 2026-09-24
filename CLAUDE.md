@@ -5,7 +5,8 @@
 - Hovedperson: Stian Lønvik fra Inderøy (`HERO` i `src/data.js`).
 - All tekst i spillet er på norsk bokmål.
 - Grafikk tegnes i kode i `src/draw.js` (16×16-ruter, helten er 16×24). Ikke legg til bilder fra originalspillet. Eksterne sprites (OpenGameArt) ligger i `assets-src/`; `scripts/prepare-assets.py` genererer `src/assets.js` (data-URI-er). Ikke rediger `src/assets.js` for hånd. Lisens i `CREDITS.md`.
-- Lerretet har `RES` (2) skjermpiksler per logisk piksel; all spillogikk regner i logiske piksler.
+- Lyd (musikk + effekter, CC0 fra OpenGameArt/Kenney.nl) spilles av via vanlige `<audio>`-elementer i `src/audio.js` — ikke syntetisert. Originalfiler i `audio-src/`; `scripts/prepare-audio.sh` (krever ffmpeg) konverterer til `public/audio/`, som serveres statisk (ikke data-URI, lyd er for stort til å base64-bunte). Lisens i `CREDITS.md`.
+- Lerretet har `RES` (2) skjermpiksler per logisk piksel; all spillogikk regner i logiske piksler. Antall synlige ruter (`renderer.setView`) er dynamisk — `fit()` i `src/main.js` regner ut hvor mye av verden som vises ut fra vindusstørrelsen (minst 18×10 ruter), ikke en fast konstant.
 - Verden genereres deterministisk fra `S.seed`; bare endringer lagres (utforsket kart, gravde gruver).
 - Balanse (priser, forbruk, gullmengder) ligger i `src/data.js`, `pass()` og `veinYield()`.
 - Kjør `npm test` etter endringer i `src/world.js`: alle viktige steder må kunne nås fra byen.

@@ -6,6 +6,8 @@ import {
 import { hash2 } from './rng.js';
 import { generateTrail, generateMine, veinYield, MINE_ENTRY } from './world.js';
 import { Renderer, drawMap } from './draw.js';
+import { RES } from './assets.js';
+import { playSfx, setMusicZone, isMuted, toggleMuted } from './audio.js';
 
 const SAVE_KEY = 'gullgraver-loen:v2';
 const $ = (id) => document.getElementById(id);
@@ -140,6 +142,7 @@ function pass(minutes) {
 
 function hurt(n, msg) {
   S.health -= n;
+  playSfx('hurt');
   log(`${msg} (−${n} helse)`);
   checkDeath();
 }
@@ -269,7 +272,7 @@ function knock(fromX) {
 }
 
 function jump() {
-  if (phys.onGround) { phys.vy = -310; phys.onGround = false; }
+  if (phys.onGround) { phys.vy = -310; phys.onGround = false; playSfx('jump'); }
 }
 
 function tileWalked(inWater) {
@@ -310,6 +313,7 @@ function interact() {
 }
 
 function drinkWell() {
+  playSfx('splash');
   S.water = 100;
   pass(5);
   log('Du drikker deg utørst og fyller feltflaska ved brønnen.');
@@ -382,6 +386,7 @@ function mineStep(dx, dy) {
   if (DIGGABLE.has(t)) {
     if (!S.inv.pick) { log('Du trenger en hakke for å grave her. Hansens handel har.'); return; }
     const gold = dig(m, nx, ny, 1, dy !== 0 ? M.LADDER : M.AIR);
+    playSfx(gold > 0.6 ? 'success' : 'dig');
     if (dy < 0 && here === M.AIR) m.tiles[y * MINE_W + x] = M.LADDER;
     pass(45);
     if (S.over) return;
@@ -422,6 +427,7 @@ function panGold() {
   if (S.mode !== 'world') return log('Det finnes ingen bekk her nede.');
   const ci = tr.creekAt(col());
   if (ci < 0) return log('Du må stå i en bekk for å vaske gull.');
+  playSfx('splash');
   pass(60);
   if (S.over) return;
   const n = S.panned[ci] || 0;
@@ -434,6 +440,7 @@ function panGold() {
 
 function fillWater() {
   if (S.mode !== 'world' || tr.creekAt(col()) < 0) return log('Du finner ikke vann her. Gå til en bekk eller brønnen i byen.');
+  playSfx('splash');
   S.water = 100;
   pass(10);
   log('Du drikker og fyller feltflaska i bekken.');
@@ -453,6 +460,7 @@ function blast() {
     }
   }
   pass(20);
+  playSfx('blast');
   log(`BOM! ${n} vegger raser sammen${gold > 0 ? `, og du plukker ${fmt(gold)} oz gull ut av steinene` : ''}.`);
   if (Math.random() < 0.15) hurt(18, 'Taket gir etter og deler av det faller over deg!');
   fall(m);
@@ -475,8 +483,9 @@ function camp() {
 // ---------- Bygninger ----------
 
 function buy(price, fn) {
-  if (S.money < price) { log(`Du har ikke råd. Det koster $${price}.`); return; }
+  if (S.money < price) { playSfx('error'); log(`Du har ikke råd. Det koster $${price}.`); return; }
   S.money -= price;
+  playSfx('coin');
   fn();
 }
 
@@ -566,6 +575,7 @@ function rumor() {
 function openBuilding(id) {
   S.lastRumor = null;
   held.left = held.right = false;
+  playSfx('door');
   openPanel(BUILDING_PANELS[id]);
 }
 
@@ -579,6 +589,7 @@ function openPanel(fn) {
 
 function closePanel(force = false) {
   if (!force && panelFn && panelFn().locked) return;
+  if (panelFn) playSfx('click');
   panelFn = null;
   $('panel').hidden = true;
   $('map-wrap').hidden = true;
@@ -598,7 +609,7 @@ function renderPanel() {
     el.className = 'btn';
     el.textContent = b.label;
     el.disabled = !!b.disabled;
-    el.addEventListener('click', () => { b.act(); if (panelFn) renderPanel(); refresh(); });
+    el.addEventListener('click', () => { playSfx('click'); b.act(); if (panelFn) renderPanel(); refresh(); });
     box.append(el);
   }
   (box.querySelector('button:not(:disabled)') || $('panel-close'))?.focus({ preventScroll: true });
@@ -646,6 +657,7 @@ function updateHud() {
   $('act-blast').disabled = !inMine || S.inv.dynamite <= 0;
   $('act-camp').disabled = inMine || tr.inTown(col());
   setText('where', inMine ? (S.mine.key === 'dutch' ? 'Hollenderens gruve' : 'En gammel gruve') : tr.inTown(col()) ? TOWN_NAME : col() > L * 0.6 ? 'Fjellfoten' : 'Ørkenen');
+  setMusicZone(S.over ? 'gameover' : inMine ? 'mine' : tr.inTown(col()) ? 'town' : 'trail');
 }
 
 function refresh() {
@@ -758,9 +770,11 @@ $('panel').addEventListener('click', (e) => { if (e.target === $('panel')) close
 function fit() {
   const stage = $('stage');
   const c = $('view');
-  const aspect = stage.clientHeight / Math.max(1, stage.clientWidth);
-  const vw = 18;
-  const vh = clamp(Math.round(vw * aspect), 10, 16);
+  const px = TILE * RES; // skjermpiksler per rute ved 1:1-skala
+  // Vis minst det opprinnelige utsynet (18×10 ruter); på større vinduer vises mer av verden
+  // i stedet for at pikslene bare blåses opp.
+  const vw = clamp(Math.round(stage.clientWidth / px), 18, 40);
+  const vh = clamp(Math.round(stage.clientHeight / px), 10, 24);
   renderer.setView(vw, vh);
   const k = Math.min(stage.clientWidth / c.width, stage.clientHeight / c.height);
   const scale = k >= 2 ? Math.floor(k) : k;
@@ -777,3 +791,13 @@ $('btn-continue').hidden = !saved;
 $('btn-continue').addEventListener('click', () => continueGame(saved));
 $('btn-new').addEventListener('click', newGame);
 (saved ? $('btn-continue') : $('btn-new')).focus();
+
+// ---------- Lyd ----------
+
+function updateMuteBtn() {
+  const m = isMuted();
+  $('btn-mute').textContent = m ? '🔇' : '🔊';
+  $('btn-mute').setAttribute('aria-label', m ? 'Skru på lyd' : 'Skru av lyd');
+}
+$('btn-mute').addEventListener('click', () => { toggleMuted(); updateMuteBtn(); });
+updateMuteBtn();

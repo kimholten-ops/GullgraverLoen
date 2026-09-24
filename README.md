@@ -47,6 +47,7 @@ src/world.js            prosedyregenerering av kart og gruver
 src/draw.js             pikselgrafikk (tegnet i kode) og rendering
 src/data.js             konstanter, priser, tekster — juster balansen her
 src/rng.js              deterministisk tilfeldighet (frø → samme verden)
+src/audio.js            musikk og lydeffekter
 src/style.css           stil, lys/mørk modus
 test/world.test.js      sjekker at alt kan nås på 200 tilfeldige kart
 ```
@@ -65,9 +66,20 @@ Slik bytter eller legger du til grafikk:
 
 Lerretet tegnes med 2 skjermpiksler per logisk piksel (`RES`), så grafikken blir skarp.
 
+## Lyd
+
+Musikk (by, sti/ørken, game over) og lydeffekter kommer fra OpenGameArt og Kenney.nl (CC0, se `CREDITS.md`). Det spilles av med vanlige `<audio>`-elementer via `src/audio.js` — ingen synteselyd. Byen og stien/ørkenen har hvert sitt musikkspor; det er stille i gruvene. En høyttalerknapp øverst til høyre slår lyd av/på (husket i nettleseren).
+
+Slik bytter eller legger du til lyd:
+
+1. Legg lydfilen i `audio-src/`.
+2. Legg den inn i `scripts/prepare-audio.sh` (musikk beholder full lengde, effekter trimmes for stillhet).
+3. Kjør `scripts/prepare-audio.sh` (krever ffmpeg). Det skriver til `public/audio/`.
+4. Spill den av fra `src/audio.js` med `playSfx('navn')` eller `setMusicZone('sone')`.
+5. Før opp kilde og lisens i `CREDITS.md`.
+
 ## Veikart
 
-- [ ] Lyd: chiptune og effekter med Web Audio
 - [ ] Bæreevne: muldyret bærer mer malm og utstyr
 - [ ] Flere hendelser: sheriff, saloonslagsmål, flom i bekkene, sandstorm
 - [ ] Doktor i byen, forgiftning fra slangebitt
